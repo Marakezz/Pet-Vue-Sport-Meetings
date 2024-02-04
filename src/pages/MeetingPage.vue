@@ -103,6 +103,10 @@ const fetchMeetingPage = async () => {
       case 'Other':
         sportImg = '/other.svg'
         sportTypeOnRussian = 'Прочее'
+      default:
+        sportImg = '/other.svg'
+        sportTypeOnRussian = meeting.value.sport
+
         break
     }
     meeteingDate = meeting.value.date.slice(0, 10)
