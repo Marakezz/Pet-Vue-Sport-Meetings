@@ -129,7 +129,8 @@ onMounted(async () => {
           ><b>{{ meeting.place }}</b></ins
         >
         <br />
-        Дата проведения: <b>{{ meeteingDate }} {{ meetingTime }}</b>
+        Дата проведения: <b>{{ meeteingDate }} {{ meetingTime }}</b> <br />
+        <div v-if="meeting.description">Описание: {{ meeting.description }}</div>
       </h2>
     </div>
 

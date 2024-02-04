@@ -2,46 +2,60 @@
 import { inject } from 'vue'
 import axios from 'axios'
 const sportModel = defineModel('sportModel')
+const otherSportModel = defineModel('otherSportModel')
 const placeModel = defineModel('placeModel')
 const descriptionModel = defineModel('descriptionModel')
 const dateModel = defineModel('dateModel')
 const user = inject('user')
 const isLoged = inject('isLoged')
 
+let finalSportType = ''
 const meetingCreated = async () => {
   if (!isLoged.value) {
     alert('Сначала войдите в профиль')
   } else {
-    if (!user.isAdmin && user.numberOfCreatedMeetings >= 2) {
-      alert(
-        'Вы не можете создавать больше 2 мероприятий. Купите подписку чтобы создавать больше :D'
-      )
+    if (sportModel.value !== 'Other') {
+      finalSportType = sportModel.value
     } else {
-      const obj = {
-        author: user.name,
-        sport: sportModel.value,
-        place: placeModel.value,
-        date: dateModel.value,
-        description: descriptionModel.value,
-        playersList: [
-          {
-            id: 1,
-            mainId: user.id,
-            name: user.name
-          }
-        ]
+      if (otherSportModel.value) {
+        finalSportType = otherSportModel.value
       }
-      const { data } = await axios.post(`https://09aef11d7b814e84.mokky.dev/meetings`, obj)
-      const { data1 } = await axios.patch(`https://09aef11d7b814e84.mokky.dev/users/${user.id}`, {
-        numberOfCreatedMeetings: user.numberOfCreatedMeetings + 1
-      })
+    }
+    if (!(finalSportType && placeModel.value && dateModel.value)) {
+      alert('Не все поля заполнены')
+    } else {
+      if (!user.isAdmin && user.numberOfCreatedMeetings >= 2) {
+        alert(
+          'Вы не можете создавать больше 2 мероприятий. Купите подписку чтобы создавать больше :D'
+        )
+      } else {
+        const obj = {
+          author: user.name,
+          sport: finalSportType,
+          place: placeModel.value,
+          date: dateModel.value,
+          description: descriptionModel.value,
+          playersList: [
+            {
+              id: 1,
+              mainId: user.id,
+              name: user.name
+            }
+          ]
+        }
+        const { data } = await axios.post(`https://09aef11d7b814e84.mokky.dev/meetings`, obj)
+        const { data1 } = await axios.patch(`https://09aef11d7b814e84.mokky.dev/users/${user.id}`, {
+          numberOfCreatedMeetings: user.numberOfCreatedMeetings + 1
+        })
 
-      user.numberOfCreatedMeetings++
-      sportModel.value = ''
-      placeModel.value = ''
-      dateModel.value = ''
-      descriptionModel.value = ''
-      alert('Успешно создано')
+        user.numberOfCreatedMeetings++
+        sportModel.value = ''
+        placeModel.value = ''
+        dateModel.value = ''
+        descriptionModel.value = ''
+        finalSportType = ''
+        alert('Успешно создано')
+      }
     }
   }
   // console.log(Date.now())
@@ -68,6 +82,14 @@ const meetingCreated = async () => {
           <option value="Basketball">Баскетбол</option>
           <option value="Other">Другое</option>
         </select>
+        <input
+          v-model="otherSportModel"
+          :disabled="sportModel !== 'Other'"
+          required
+          class="ml-4"
+          type="text"
+          placeholder="Вид спорта"
+        />
       </div>
       <div class="mt-4">
         Место проведения:
@@ -88,14 +110,15 @@ const meetingCreated = async () => {
         />
       </div>
 
+      <h2 v-if="!isLoged" class="mt-4 text-red-600">Чтобы создать мероприятие войдите в систему</h2>
       <button
+        type="submit"
         v-if="isLoged"
         @click="meetingCreated"
         class="mt-4 bg-zinc-200 font-bold border-separate border-2"
       >
         Создать
       </button>
-      <h2 v-if="!isLoged" class="mt-4 text-red-600">Чтобы создать мероприятие войдите в систему</h2>
     </form>
   </div>
 </template>

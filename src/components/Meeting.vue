@@ -38,6 +38,10 @@ switch (props.sport) {
     sportImg = '/other.svg'
     sportTypeOnRussian = 'Прочее'
     break
+  default:
+    sportImg = '/other.svg'
+    sportTypeOnRussian = props.sport
+    break
 }
 </script>
 
