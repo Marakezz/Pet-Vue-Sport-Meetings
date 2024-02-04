@@ -65,11 +65,13 @@ const registration = async (obj) => {
         user.isAdmin = false
         const { data } = await axios.post('https://09aef11d7b814e84.mokky.dev/users', user)
         isLoged.value = true
+        user.id = data.id
       } else {
         alert('Пароли не совпадают')
       }
     }
   }
+
   await fetchUsers()
 }
 
