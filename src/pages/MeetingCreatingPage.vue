@@ -12,28 +12,45 @@ const meetingCreated = async () => {
   if (!isLoged.value) {
     alert('Сначала войдите в профиль')
   } else {
-    const obj = {
-      author: user.name,
-      sport: sportModel.value,
-      place: placeModel.value,
-      date: dateModel.value,
-      description: descriptionModel.value,
-      playersList: [
-        {
-          id: 1,
-          mainId: user.id,
-          name: user.name
-        }
-      ]
+    if (!user.isAdmin && user.numberOfCreatedMeetings >= 2) {
+      alert(
+        'Вы не можете создавать больше 2 мероприятий. Купите подписку чтобы создавать больше :D'
+      )
+    } else {
+      const obj = {
+        author: user.name,
+        sport: sportModel.value,
+        place: placeModel.value,
+        date: dateModel.value,
+        description: descriptionModel.value,
+        playersList: [
+          {
+            id: 1,
+            mainId: user.id,
+            name: user.name
+          }
+        ]
+      }
+      const { data } = await axios.post(`https://09aef11d7b814e84.mokky.dev/meetings`, obj)
+      const { data1 } = await axios.patch(`https://09aef11d7b814e84.mokky.dev/users/${user.id}`, {
+        numberOfCreatedMeetings: user.numberOfCreatedMeetings + 1
+      })
+
+      user.numberOfCreatedMeetings++
+      sportModel.value = ''
+      placeModel.value = ''
+      dateModel.value = ''
+      descriptionModel.value = ''
+      alert('Успешно создано')
     }
-    const { data } = await axios.post(`https://09aef11d7b814e84.mokky.dev/meetings`, obj)
-    alert('Успешно создано')
   }
+  // console.log(Date.now())
+  // console.log(dateModel.value)
 }
 </script>
 
 <template>
-  <div class="w-3/4 mx-auto mt-4 h-full bg-slate-100">
+  <div class="w-3/4 mx-auto mt-4 h-full bg-slate-100" v-auto-animate>
     <h1 class="font-bold">Введите данные о своем событии:</h1>
     <form class="mt-4 ml-2" @submit.prevent="">
       <div>
@@ -62,17 +79,22 @@ const meetingCreated = async () => {
       </div>
       <div class="mt-4">
         Введите дату проведения:
-        <input v-model="dateModel" required class="ml-2" type="datetime-local" />
+        <input
+          v-model="dateModel"
+          required
+          class="ml-2"
+          type="datetime-local"
+          :min="new Date().toISOString().slice(0, 16)"
+        />
       </div>
-      <router-link to="/"
-        ><button
-          v-if="isLoged"
-          @click="meetingCreated"
-          class="mt-4 bg-zinc-200 font-bold border-separate border-2"
-        >
-          Создать
-        </button></router-link
+
+      <button
+        v-if="isLoged"
+        @click="meetingCreated"
+        class="mt-4 bg-zinc-200 font-bold border-separate border-2"
       >
+        Создать
+      </button>
       <h2 v-if="!isLoged" class="mt-4 text-red-600">Чтобы создать мероприятие войдите в систему</h2>
     </form>
   </div>

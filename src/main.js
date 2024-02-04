@@ -9,6 +9,10 @@ import {
 } from 'vue'
 import App from './App.vue'
 
+import {
+    autoAnimatePlugin
+} from '@formkit/auto-animate/vue'
+import * as ConfirmDialog from 'vuejs-confirm-dialog'
 import Home from './pages/Home.vue'
 import MeetingPage from './pages/MeetingPage.vue'
 import MeetingCreatingPage from './pages/MeetingCreatingPage.vue'
@@ -39,5 +43,6 @@ const router = createRouter({
 
 
 app.use(router)
-// app.use(autoAnimatePlugin)
+app.use(autoAnimatePlugin)
+app.use(ConfirmDialog)
 app.mount('#app')

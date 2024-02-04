@@ -8,6 +8,11 @@ const meeting = ref({})
 const players = ref([])
 const user = inject('user')
 const isLoged = inject('isLoged')
+let sportImg = ''
+let sportTypeOnRussian = ''
+let meeteingDate = ''
+let meetingTime = ''
+
 // const isSignedUp = computed(() => {
 //   if (!isLoged) return false
 //   return players.value.some((item) => item.mainId === user.id)
@@ -78,6 +83,30 @@ const fetchMeetingPage = async () => {
     )
     meeting.value = data
     players.value = meeting.value.playersList
+    switch (meeting.value.sport) {
+      case 'Football':
+        sportImg = '/football.svg'
+        sportTypeOnRussian = 'Футбол'
+        break
+      case 'Volleyball':
+        sportImg = '/volleyball.svg'
+        sportTypeOnRussian = 'Воллейбол'
+        break
+      case 'Basketball':
+        sportImg = '/basketball.svg'
+        sportTypeOnRussian = 'Баскетбол'
+        break
+      case 'Hockey':
+        sportImg = '/hockey.svg'
+        sportTypeOnRussian = 'Хоккей'
+        break
+      case 'Other':
+        sportImg = '/other.svg'
+        sportTypeOnRussian = 'Прочее'
+        break
+    }
+    meeteingDate = meeting.value.date.slice(0, 10)
+    meetingTime = meeting.value.date.slice(11, 16)
   } catch (err) {
     console.log(err)
   }
@@ -88,16 +117,22 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <div class="bg-white w-2/3 mx-auto">
+  <div class="bg-white w-2/3 mx-auto mt-4">
     <!-- <h2>{{ $route.params }}</h2> -->
-    <h2
-      class="text-center cursor-pointer mx-auto align-middle mb-2 py-4 h-16 border-separate border-2 border-gray-200"
-    >
-      <b>{{ meeting.sport }}</b> meeting by <b>{{ meeting.author }}</b> on the
-      <ins
-        ><b>{{ meeting.place }}</b></ins
-      >
-    </h2>
+    <div class="lg:flex justify-center border-separate border-2 border-gray-200">
+      <img class="w-10 mx-auto mt-2 lg:mt-0 lg:mx-0" :src="sportImg" alt="Sport" />
+      <h2 class="lg:ml-10 text-center align-middle mb-2 py-4">
+        <b>{{ sportTypeOnRussian }}</b
+        >. Организатор - <b>{{ meeting.author }}</b
+        >. Место проведения -
+        <ins
+          ><b>{{ meeting.place }}</b></ins
+        >
+        <br />
+        Дата проведения: <b>{{ meeteingDate }} {{ meetingTime }}</b>
+      </h2>
+    </div>
+
     <h2 class="ml-4">Список игроков:</h2>
     <div class="flex justify-between">
       <div>
@@ -108,7 +143,7 @@ onMounted(async () => {
       <button
         v-if="!isSignedUp"
         @click="signUpToMeeting"
-        class="mr-4 mb-2 font-bold border-2 border-green-500"
+        class="mr-4 mb-2 h-8 font-bold border-2 border-green-500"
       >
         Записаться
       </button>
